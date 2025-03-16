@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  ems-db:
+    image: postgres:17
+    container_name: ems-db
+    restart: always
+    environment:
+      POSTGRES_DB: ems_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Malvi1amit
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - ems-network
+
+  ems-backend:
+    build: ./backend
+    container_name: ems-backend
+    depends_on:
+      - ems-db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://ems-db:5432/ems_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: Malvi1amit
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    ports:
+      - "8080:8080"
+    networks:
+      - ems-network
+
+  ems-frontend:
+    build: ./Frontend/frontend
+    container_name: ems-frontend
+    depends_on:
+      - ems-backend
+    ports:
+      - "3000:3000"
+    networks:
+      - ems-network
+
+volumes:
+  postgres_data:
+
+networks:
+  ems-network:
